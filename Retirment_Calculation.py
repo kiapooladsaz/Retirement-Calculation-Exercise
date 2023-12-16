@@ -1,38 +1,38 @@
 def calculateRetirement(start_age, initial, working, retired):
-    def calculate_monthly_balance(balance, rate_of_return, contribution):
-        monthly_return = balance * rate_of_return
-        balance += monthly_return
-        balance += contribution
-        return balance, monthly_return
+    def compute_balance(balance, contribution, rate_of_return):
+        interest_earned = balance * rate_of_return
+        balance += interest_earned + contribution
+        return balance
 
-    def print_balance(age, month, balance):
-        if age != 100:
-            print(f'Age {age:3d} month {month:2d} you have ${balance:.2f}')
-
-    age, month = divmod(start_age, 12)
-
-    if start_age != 100:
-        print_balance(age, month, initial)
-
-    working_months, working_contribution, working_rate_of_return = working
-    retired_months, retired_contribution, retired_rate_of_return = retired
-
-    for _ in range(working_months):
-        initial, monthly_return = calculate_monthly_balance(initial, working_rate_of_return, working_contribution)
-        age, month = divmod(start_age + 1, 12)
+    # Working phase
+    for month in range(1, working[0] + 1):  # Start from month 1
+        age_years = start_age // 12
+        age_months = start_age % 12
+        print('Age {:2d} month {:2d} you have ${:.2f}'.format(age_years, age_months, initial))
+        initial = compute_balance(initial, working[1], working[2])
         start_age += 1
-        print_balance(age, month, initial)
 
-    for _ in range(retired_months):
-        initial, monthly_return = calculate_monthly_balance(initial, retired_rate_of_return, retired_contribution)
-        age, month = divmod(start_age + 1, 12)
+    # Retired phase
+    for month in range(retired[0]):
+        age_years = start_age // 12
+        age_months = start_age % 12
+        print('Age {:2d} month {:2d} you have ${:.2f}'.format(age_years, age_months, initial))
+        initial = compute_balance(initial, retired[1], retired[2])
         start_age += 1
-        print_balance(age, month, initial)
-
-def main():
-    working = (489, 1000, 0.045 / 12)
-    retired = (384, -4000, 0.01 / 12)
-    calculateRetirement(327, 21345, working, retired)
 
 if __name__ == "__main__":
-    main()
+    # Test values
+    months_working = 489
+    per_month_savings = 1000
+    rate_of_return_working = 0.045 / 12  # 4.5% per year (above inflation)
+
+    months_retired = 384
+    per_month_spending = -4000
+    rate_of_return_retired = 0.01 / 12  # 1% per year (above inflation)
+
+    start_age = 327
+    initial_savings = 21345
+
+    # Call the function with test values
+    calculateRetirement(start_age, initial_savings, (months_working, per_month_savings, rate_of_return_working),
+                         (months_retired, per_month_spending, rate_of_return_retired))
